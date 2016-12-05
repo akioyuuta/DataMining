@@ -2,7 +2,7 @@
 
 include "connect.php";
 
-session_start();
+//session_start();
 $data = array();
 if(isset($_SESSION['last_session'])){
 	$data = unserialize($_SESSION['last_session']);
@@ -58,7 +58,7 @@ if(isset($_SESSION['last_session'])){
 						<div class="col-sm-4">
 							<div class="form-group">
 								<label for="decimal-range">Min.Support : &nbsp&nbsp&nbsp</label>
-								<input id="ex8" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.001" data-slider-value="0.003"/>
+								<input id="ex8" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.001" data-slider-value="0.02"/>
 							</div>
 						</div>
 						<div class="col-sm-2">

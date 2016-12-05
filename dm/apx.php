@@ -2,11 +2,11 @@
 
 include "connect.php";
 
-$sql = "SELECT invoice_number FROM invoice";
+$sql = "SELECT DISTINCT(invoice_number) FROM detail_invoice";
 $res = mysqli_query($con, $sql);
 $count = mysqli_num_rows($res);
 
-$min_support = 0.003;
+$min_support = 0.02;
 $count_support = $min_support * $count;
 
 echo "Min Support : ".$min_support."<br>";

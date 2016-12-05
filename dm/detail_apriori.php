@@ -1,6 +1,6 @@
 <?php 
 
-include "connect.php";
+include "function.php";
 
 $arr = json_decode($_GET['a']);
 
@@ -104,6 +104,41 @@ $(function () {
 	<div class="row">
 		<div class="col-sm-12">
 			<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">Association Rule</div>
+				<div class="panel-body">
+					<?php 
+
+					$result = calculate_support_confidence($arr);
+
+					?>
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Rule</th>
+								<th>Support</th>
+								<th>Confidence</th>
+							</tr>
+						</thead>
+						<?php $co = 1; ?>
+						<tbody>
+							<?php foreach($result as $value) { ?>
+								<tr>
+									<td><?php echo $co++; ?></td>
+									<td><b><?php echo print_rule($value['left'], $value['right']); ?></b></td>
+									<td><?php echo $value['support'].' %'; ?></td>
+									<td><?php echo $value['confidence'].' %'; ?></td>
+								</tr>
+							<?php } ?>
+						</tbody>
+					</table>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

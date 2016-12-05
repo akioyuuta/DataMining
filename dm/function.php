@@ -60,7 +60,7 @@ function apriori($min_support){
 	global $con;
 	$ans = array();
 	// ========================== Step 1 : Calculate Min Support  ================================
-	$sql = "SELECT invoice_number FROM invoice";
+	$sql = "SELECT DISTINCT(invoice_number) FROM detail_invoice";
 	$res = mysqli_query($con, $sql);
 	$count = mysqli_num_rows($res);
 
@@ -167,4 +167,93 @@ function apriori($min_support){
 
 	// ===========================================================================================
 }
+
+
+function calculate_confidence($a, $b){
+	global $con;
+	$items = array_merge($a,$b);
+	$sql = "SELECT COUNT(invoice_number) AS count FROM detail_invoice WHERE ";
+	$n = count($items);
+	for($q = 0; $q < $n; $q++){
+		$sql .= 'stock_code = "'.$items[$q].'"';
+		if($q < $n - 1){
+			$sql .= ' OR ';
+		}
+	}
+	$sql .= " GROUP BY invoice_number HAVING count = 3; ";
+	$res = mysqli_query($con, $sql);
+	$tmp = mysqli_num_rows($res);
+	$sql = "SELECT * FROM detail_invoice WHERE ";
+	$n = count($a);
+	for($q = 0; $q < $n; $q++){
+		$sql .= 'stock_code = "'.$a[$q].'"';
+		if($q < $n - 1){
+			$sql .= ' OR ';
+		}
+	}
+	$res = mysqli_query($con, $sql);
+	$count = mysqli_num_rows($res);
+	return $tmp / $count * 100;
+}
+
+function calculate_support($items){
+	global $con;
+	$sql = "SELECT * FROM detail_invoice WHERE ";
+	$n = count($items);
+	for($q = 0; $q < $n; $q++){
+		$sql .= 'stock_code = "'.$items[$q].'"';
+		if($q < $n - 1){
+			$sql .= ' OR ';
+		}
+	}
+	$res = mysqli_query($con, $sql);
+	$tmp = mysqli_num_rows($res);
+	$sql = "SELECT invoice_number FROM invoice";
+	$res = mysqli_query($con, $sql);
+	$count = mysqli_num_rows($res);
+	return $tmp / $count * 100;
+}
+
+function calculate_support_confidence($items){
+	$n = count($items);
+	$com = array();
+	for($q = 0; $q < $n; $q++){
+		for($w = 0; $w < $n - 1; $w++){
+			$left = array();
+			$right = array();
+			for($e = 0; $e < $n; $e++){
+				if($e <= $w){
+					$left[] = $items[($q + $e) % $n];
+				}else{
+					$right[] = $items[($q + $e) % $n];
+				}
+			}
+			$support = calculate_support(array_merge($left,$right));
+			$confidence = calculate_confidence($left, $right);
+			$com[] = array("left" => $left, "right" => $right, "support" => $support, "confidence" => $confidence);
+		}
+	}
+	return $com;
+}
+
+function print_rule($left, $right){
+	$str = '';
+	$n = count($left);
+	for($q = 0; $q < $n; $q++){
+		$str .= $left[$q];
+		if($q < $n - 1){
+			$str .= ' ^ ';
+		}
+	}
+	$str .= ' => ';
+	$n = count($right);
+	for($q = 0; $q < $n; $q++){
+		$str .= $right[$q];
+		if($q < $n - 1){
+			$str .= ' ^ ';
+		}
+	}
+	return $str;
+}
+
 ?>
